@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: vllm-model-pv
+  namespace: vllm-llama3
+spec:
+  capacity:
+    storage: 500Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/path/to/model"  # Path on the node where model is copied
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vllm-model-pvc
+  namespace: vllm-llama3
+spec:
+  accessModes:
+    - ReadWriteMany # Or Once if not using the model-loader pod
+  resources:
+    requests:
+      storage: 500Gi

@@ -1,0 +1,74 @@
+apiVersion: ray.io/v1
+kind: RayCluster
+metadata:
+  name: vllm-llama3
+  namespace: vllm-llama3
+spec:
+  headGroupSpec:
+    template:
+      spec:
+        containers:
+        - name: ray-head
+          image: image-registry.openshift-image-registry.svc:5000/vllm-llama3/ray-vllm-ubi9:latest
+          volumeMounts:
+          - mountPath: "/app/model"
+            name: model-volume
+          resources:
+            limits:
+              nvidia.com/gpu: "2"
+        volumes:
+        - name: model-volume
+          persistentVolumeClaim:
+            claimName: vllm-model-pvc
+    rayStartParams:
+      port: "6379"
+      block: "true"
+  workerGroupSpecs:
+  - groupName: worker-group
+    replicas: 7  # 7 workers + 1 head = 8 nodes for 16 GPUs
+    template:
+      spec:
+        containers:
+        - name: ray-worker
+          image: image-registry.openshift-image-registry.svc:5000/vllm-llama3/ray-vllm-ubi9:latest
+          volumeMounts:
+          - mountPath: "/app/model"
+            name: model-volume
+          resources:
+            limits:
+              nvidia.com/gpu: "2"
+        volumes:
+        - name: model-volume
+          persistentVolumeClaim:
+            claimName: vllm-model-pvc
+    rayStartParams:
+      address: "vllm-llama3-head-svc:6379"
+      block: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vllm-llama3-head-svc
+  namespace: vllm-llama3
+spec:
+  selector:
+    ray.io/node-type: head
+  ports:
+  - name: ray
+    port: 6379
+    targetPort: 6379
+  - name: vllm
+    port: 8000
+    targetPort: 8000
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: vllm-route
+  namespace: vllm-llama3
+spec:
+  to:
+    kind: Service
+    name: vllm-llama3-head-svc
+  port:
+    targetPort: 8000

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: model-loader
+  namespace: vllm-llama3
+spec:
+  containers:
+  - name: loader
+    image: registry.access.redhat.com/ubi9/ubi-minimal:latest
+    command: ["sleep", "infinity"]
+    volumeMounts:
+    - mountPath: "/model"
+      name: model-volume
+  volumes:
+  - name: model-volume
+    persistentVolumeClaim:
+      claimName: vllm-model-pvc

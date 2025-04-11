@@ -1,0 +1,11 @@
+FROM nvidia/cuda:12.8.0-base-ubuntu24.04
+
+RUN apt-get update && apt-get install -y python3-pip python3-dev build-essential
+
+RUN pip3 install "ray[default]" vllm torch --no-cache-dir
+
+WORKDIR /app
+
+EXPOSE 6379 8000
+
+CMD ["bash"]
