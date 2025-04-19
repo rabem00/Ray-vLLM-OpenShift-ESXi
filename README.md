@@ -5,6 +5,8 @@ In this repository we are looking at Multi GPU systems (VMWare ESXi) using OpenS
 
 **Note:** This repository is an excerpt from a private repository, designed for sharing purposes. It contains curated content to illustrate concepts and configurations without revealing sensitive information. As an excerpt, it may require additional code or configuration for complete implementation.
 
+## Open MPI
+A pdf document added (in Dutch) which describes an alternative method using [Open MPI instead of Ray](https://github.com/rabem00/Ray-vLLM-OpenShift-ESXi/blob/main/vLLM-met-Ray-of-MPI-voor-gedistribueerde-inference.pdf)
 
 ## Assigning GPUs to a Single VM Worker Node
 It’s not possible to assign all 16 GPUs from 8 ESXi servers (2 GPUs each) to a single VM using GPU passthrough or vGPU. VMware vSphere restricts GPU assignment to the *physical host running the VM*, and cross-host GPU aggregation isn’t supported.
